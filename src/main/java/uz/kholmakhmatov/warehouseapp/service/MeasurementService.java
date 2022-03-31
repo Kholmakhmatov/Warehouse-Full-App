@@ -21,6 +21,13 @@ public class MeasurementService {
         return measurementRepository.findAllByActiveTrue(pageable);
     }
 
+    public ResponseData findOne(Long id) {
+        Optional<Measurement> optionalMeasurement = measurementRepository.findByIdAndActiveTrue(id);
+        return optionalMeasurement.map(measurement -> new ResponseData("Success", true, optionalMeasurement.get()))
+                .orElseGet(() -> new ResponseData("Warehouse does not exist", false));
+
+    }
+
     public ResponseData save(Measurement measurement) {
         Optional<Measurement> optionalMeasurement = measurementRepository.findByName(measurement.getName());
         if (optionalMeasurement.isEmpty()){
@@ -37,11 +44,17 @@ public class MeasurementService {
         return new ResponseData("Successfully saved", true);
     }
 
-    public ResponseData findOne(Long id) {
+    public ResponseData edit(Long id, Measurement measurement) {
         Optional<Measurement> optionalMeasurement = measurementRepository.findByIdAndActiveTrue(id);
-        return optionalMeasurement.map(measurement -> new ResponseData("Success", true, optionalMeasurement.get()))
-                .orElseGet(() -> new ResponseData("Warehouse does not exist", false));
+        if (optionalMeasurement.isEmpty()){
+            return new ResponseData("Measurement does not exist", false);
+        }
+        Optional<Measurement> byName = measurementRepository.findByNameAndActiveFalse(measurement.getName());
+        byName.ifPresent(value -> measurementRepository.delete(value));
 
+        measurement.setId(id);
+        measurementRepository.save(measurement);
+        return new ResponseData("Successfully saved", true);
     }
 
     public ResponseData delete(Long id) {
@@ -55,18 +68,5 @@ public class MeasurementService {
         measurementRepository.save(measurement);
 
         return new ResponseData("Successfully deleted", true);
-    }
-
-    public ResponseData edit(Long id, Measurement measurement) {
-        Optional<Measurement> optionalMeasurement = measurementRepository.findByIdAndActiveTrue(id);
-        if (optionalMeasurement.isEmpty()){
-            return new ResponseData("Measurement does not exist", false);
-        }
-        Optional<Measurement> byName = measurementRepository.findByNameAndActiveFalse(measurement.getName());
-        byName.ifPresent(value -> measurementRepository.delete(value));
-
-        measurement.setId(id);
-        measurementRepository.save(measurement);
-        return new ResponseData("Successfully saved", true);
     }
 }

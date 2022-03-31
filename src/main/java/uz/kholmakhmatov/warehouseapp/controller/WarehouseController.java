@@ -12,7 +12,7 @@ import uz.kholmakhmatov.warehouseapp.service.WarehouseService;
 
 
 @RestController
-@RequestMapping("/warehouse")
+@RequestMapping("api/warehouse")
 public class WarehouseController {
 
     @Autowired
@@ -23,23 +23,24 @@ public class WarehouseController {
         return warehouseService.getAll(pageable);
     }
 
-    @PostMapping
-    public ResponseData addWarehouse(@RequestBody Warehouse warehouse) {
-        return warehouseService.save(warehouse);
-    }
-
     @GetMapping("/{id}")
     public ResponseData findOne(@PathVariable Long id) {
         return warehouseService.findOne(id);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseData delete(@PathVariable Long id){
-        return warehouseService.delete(id);
+    @PostMapping
+    public ResponseData addWarehouse(@RequestBody Warehouse warehouse) {
+        return warehouseService.save(warehouse);
     }
 
     @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody Warehouse warehouse){
+    public ResponseData edit(@PathVariable Long id, @RequestBody Warehouse warehouse) {
         return warehouseService.edit(id, warehouse);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseData delete(@PathVariable Long id) {
+        return warehouseService.delete(id);
+    }
+
 }

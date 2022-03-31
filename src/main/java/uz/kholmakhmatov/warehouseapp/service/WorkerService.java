@@ -29,6 +29,16 @@ public class WorkerService {
         return workerRepository.findAllByActiveTrue(pageable);
     }
 
+    public ResponseData findOne(Long id) {
+        Optional<Worker> optionalWorker = workerRepository.findByIdAndActiveTrue(id);
+        return optionalWorker.map(worker -> new ResponseData("Success", true, worker))
+                .orElseGet(() -> new ResponseData("Worker does not exist", false));
+    }
+
+    public Page<Worker> getByWarehouse(Long id, Pageable pageable) {
+        return workerRepository.findAllByWarehouseIdAndActiveTrue(id, pageable);
+    }
+
     public ResponseData save(WorkerDto workerDto) {
         Optional<Worker> workerOptional = workerRepository.findByPhoneNumber(workerDto.getPhoneNumber());
 
@@ -42,25 +52,6 @@ public class WorkerService {
         workerRepository.save(toEntity(workerDto));
 
         return new ResponseData("Successfully saved", true, workerDto);
-    }
-
-    public ResponseData findOne(Long id) {
-        Optional<Worker> optionalWorker = workerRepository.findByIdAndActiveTrue(id);
-        return optionalWorker.map(worker -> new ResponseData("Success", true, worker))
-                .orElseGet(() -> new ResponseData("Worker does not exist", false));
-    }
-
-    public ResponseData delete(Long id) {
-        Optional<Worker> optionalWorker = workerRepository.findByIdAndActiveTrue(id);
-
-        if (optionalWorker.isEmpty())
-            return new ResponseData("Not found", false);
-
-        Worker worker = optionalWorker.get();
-        worker.setActive(false);
-        workerRepository.save(worker);
-
-        return new ResponseData("Successfully deleted", true);
     }
 
     public ResponseData edit(Long id, WorkerDto workerDto) {
@@ -81,8 +72,17 @@ public class WorkerService {
         return new ResponseData("Successfully saved", true, workerDto);
     }
 
-    public Page<Worker> getByWarehouse(Long id, Pageable pageable) {
-        return workerRepository.findAllByWarehouseIdAndActiveTrue(id, pageable);
+    public ResponseData delete(Long id) {
+        Optional<Worker> optionalWorker = workerRepository.findByIdAndActiveTrue(id);
+
+        if (optionalWorker.isEmpty())
+            return new ResponseData("Not found", false);
+
+        Worker worker = optionalWorker.get();
+        worker.setActive(false);
+        workerRepository.save(worker);
+
+        return new ResponseData("Successfully deleted", true);
     }
 
     private Worker toEntity(WorkerDto workerDto) {

@@ -1,4 +1,4 @@
-package uz.kholmakhmatov.warehouseapp.entity;
+package uz.kholmakhmatov.warehouseapp.entity.attachment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

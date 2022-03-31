@@ -20,6 +20,13 @@ public class WarehouseService {
         return warehouseRepository.findAllByActiveTrue(pageable);
     }
 
+    public ResponseData findOne(Long id) {
+        Optional<Warehouse> optionalWarehouse = warehouseRepository.findByIdAndActiveTrue(id);
+        return optionalWarehouse.map(warehouse -> new ResponseData("Success", true, warehouse))
+                .orElseGet(() -> new ResponseData("Warehouse does not exist", false));
+
+    }
+
     public ResponseData save(Warehouse warehouse) {
         Optional<Warehouse> optionalWarehouse = warehouseRepository.findByName(warehouse.getName());
         if (optionalWarehouse.isEmpty()){
@@ -36,11 +43,17 @@ public class WarehouseService {
         return new ResponseData("Successfully saved", true);
     }
 
-    public ResponseData findOne(Long id) {
+    public ResponseData edit(Long id, Warehouse warehouse) {
         Optional<Warehouse> optionalWarehouse = warehouseRepository.findByIdAndActiveTrue(id);
-        return optionalWarehouse.map(warehouse -> new ResponseData("Success", true, warehouse))
-                .orElseGet(() -> new ResponseData("Warehouse does not exist", false));
+        if (optionalWarehouse.isEmpty()){
+            return new ResponseData("Warehouse does not exist", false);
+        }
+        Optional<Warehouse> byName = warehouseRepository.findByNameAndActiveFalse(warehouse.getName());
+        byName.ifPresent(value -> warehouseRepository.delete(value));
 
+        warehouse.setId(id);
+        warehouseRepository.save(warehouse);
+        return new ResponseData("Successfully saved", true);
     }
 
     public ResponseData delete(Long id) {
@@ -56,16 +69,4 @@ public class WarehouseService {
         return new ResponseData("Successfully deleted", true);
     }
 
-    public ResponseData edit(Long id, Warehouse warehouse) {
-        Optional<Warehouse> optionalWarehouse = warehouseRepository.findByIdAndActiveTrue(id);
-        if (optionalWarehouse.isEmpty()){
-            return new ResponseData("Warehouse does not exist", false);
-        }
-        Optional<Warehouse> byName = warehouseRepository.findByNameAndActiveFalse(warehouse.getName());
-        byName.ifPresent(value -> warehouseRepository.delete(value));
-
-        warehouse.setId(id);
-        warehouseRepository.save(warehouse);
-        return new ResponseData("Successfully saved", true);
-    }
 }

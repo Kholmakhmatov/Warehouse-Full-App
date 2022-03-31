@@ -12,7 +12,7 @@ import uz.kholmakhmatov.warehouseapp.response.ResponseData;
 import uz.kholmakhmatov.warehouseapp.service.WorkerService;
 
 @RestController
-@RequestMapping("/worker")
+@RequestMapping("api/worker")
 public class WorkerController {
 
     @Autowired
@@ -28,14 +28,19 @@ public class WorkerController {
         return workerService.getByWarehouse(id, pageable);
     }
 
+    @GetMapping("/{id}")
+    public ResponseData findOne(@PathVariable Long id) {
+        return workerService.findOne(id);
+    }
+
     @PostMapping
     public ResponseData add(@RequestBody WorkerDto workerDto) {
         return workerService.save(workerDto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id) {
-        return workerService.findOne(id);
+    @PutMapping("/{id}")
+    public ResponseData edit(@PathVariable Long id, @RequestBody WorkerDto workerDto) {
+        return workerService.edit(id, workerDto);
     }
 
     @DeleteMapping("/{id}")
@@ -43,8 +48,4 @@ public class WorkerController {
         return workerService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody WorkerDto workerDto) {
-        return workerService.edit(id, workerDto);
-    }
 }

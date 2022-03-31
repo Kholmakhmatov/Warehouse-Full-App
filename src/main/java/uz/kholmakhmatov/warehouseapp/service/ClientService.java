@@ -21,6 +21,12 @@ public class ClientService {
         return clientRepository.findAllByActiveTrue(pageable);
     }
 
+    public ResponseData findOne(Long id) {
+        Optional<Client> optionalClient = clientRepository.findByIdAndActiveTrue(id);
+        return optionalClient.map(client -> new ResponseData("Success", true, client))
+                .orElseGet(() -> new ResponseData("Supplier does not exist", false));
+    }
+
     public ResponseData save(Client client) {
         Optional<Client> clientOptional = clientRepository.findByPhone(client.getPhone());
 
@@ -36,10 +42,18 @@ public class ClientService {
         return new ResponseData("Successfully saved", true, client);
     }
 
-    public ResponseData findOne(Long id) {
+    public ResponseData edit(Long id, Client client) {
         Optional<Client> optionalClient = clientRepository.findByIdAndActiveTrue(id);
-        return optionalClient.map(client -> new ResponseData("Success", true, client))
-                .orElseGet(() -> new ResponseData("Supplier does not exist", false));
+        if (optionalClient.isEmpty()) {
+            return new ResponseData("Client does not exist", false);
+        }
+        Optional<Client> byPhoneNumber = clientRepository.findByPhoneAndActiveFalse(client.getPhone());
+        byPhoneNumber.ifPresent(value -> clientRepository.delete(value));
+
+        client.setId(id);
+        clientRepository.save(client);
+
+        return new ResponseData("Successfully saved", true, client);
     }
 
     public ResponseData delete(Long id) {
@@ -53,19 +67,5 @@ public class ClientService {
         clientRepository.save(client);
 
         return new ResponseData("Successfully deleted", true);
-    }
-
-    public ResponseData edit(Long id, Client client) {
-        Optional<Client> optionalClient = clientRepository.findByIdAndActiveTrue(id);
-        if (optionalClient.isEmpty()) {
-            return new ResponseData("Client does not exist", false);
-        }
-        Optional<Client> byPhoneNumber = clientRepository.findByPhoneAndActiveFalse(client.getPhone());
-        byPhoneNumber.ifPresent(value -> clientRepository.delete(value));
-
-        client.setId(id);
-        clientRepository.save(client);
-
-        return new ResponseData("Successfully saved", true, client);
     }
 }

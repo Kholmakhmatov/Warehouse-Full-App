@@ -12,7 +12,7 @@ import uz.kholmakhmatov.warehouseapp.service.ClientService;
 
 
 @RestController
-@RequestMapping("/client")
+@RequestMapping("api/client")
 public class ClientController {
 
     @Autowired
@@ -23,14 +23,18 @@ public class ClientController {
         return clientService.getAll(pageable);
     }
 
+    @GetMapping("/{id}")
+    public ResponseData findOne(@PathVariable Long id) {
+        return clientService.findOne(id);
+    }
+
     @PostMapping
     public ResponseData add(@RequestBody Client client) {
         return clientService.save(client);
     }
-
-    @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id) {
-        return clientService.findOne(id);
+    @PutMapping("/{id}")
+    public ResponseData edit(@PathVariable Long id, @RequestBody Client client) {
+        return clientService.edit(id, client);
     }
 
     @DeleteMapping("/{id}")
@@ -38,8 +42,4 @@ public class ClientController {
         return clientService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody Client client) {
-        return clientService.edit(id, client);
-    }
 }

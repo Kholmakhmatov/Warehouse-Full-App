@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.kholmakhmatov.warehouseapp.dto.ProductDto;
-import uz.kholmakhmatov.warehouseapp.entity.Attachment;
+import uz.kholmakhmatov.warehouseapp.entity.attachment.Attachment;
 import uz.kholmakhmatov.warehouseapp.entity.Category;
 import uz.kholmakhmatov.warehouseapp.entity.Measurement;
 import uz.kholmakhmatov.warehouseapp.entity.Product;
@@ -35,6 +35,12 @@ public class ProductService {
 
     public Page<Product> getAll(Pageable pageable) {
         return productRepository.findAllByActiveTrue(pageable);
+    }
+
+    public ResponseData findOne(Long id) {
+        Optional<Product> productOptional = productRepository.findByIdAndActiveTrue(id);
+        return productOptional.map(product -> new ResponseData("Success", true, product))
+                .orElseGet(() -> new ResponseData("Product does not exist", false));
     }
 
     public ResponseData save(ProductDto productDto) {
@@ -67,25 +73,6 @@ public class ProductService {
         productRepository.save(product);
 
         return new ResponseData("Successfully added", true);
-    }
-
-    public ResponseData findOne(Long id) {
-        Optional<Product> productOptional = productRepository.findByIdAndActiveTrue(id);
-        return productOptional.map(product -> new ResponseData("Success", true, product))
-                .orElseGet(() -> new ResponseData("Product does not exist", false));
-    }
-
-    public ResponseData delete(Long id) {
-        Optional<Product> productOptional = productRepository.findByIdAndActiveTrue(id);
-
-        if (productOptional.isEmpty())
-            return new ResponseData("Not found", false);
-
-        Product product = productOptional.get();
-        product.setActive(false);
-        productRepository.save(product);
-
-        return new ResponseData("Successfully deleted", true);
     }
 
     public ResponseData edit(Long id, ProductDto productDto) {
@@ -126,6 +113,18 @@ public class ProductService {
         return new ResponseData("Successfully edited", true);
     }
 
+    public ResponseData delete(Long id) {
+        Optional<Product> productOptional = productRepository.findByIdAndActiveTrue(id);
+
+        if (productOptional.isEmpty())
+            return new ResponseData("Not found", false);
+
+        Product product = productOptional.get();
+        product.setActive(false);
+        productRepository.save(product);
+
+        return new ResponseData("Successfully deleted", true);
+    }
 
     public void deleteByCategoryId(Long id) {
         productRepository.deActiveQueryNative(id);

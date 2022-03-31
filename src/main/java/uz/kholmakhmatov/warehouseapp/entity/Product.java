@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.kholmakhmatov.warehouseapp.entity.attachment.Attachment;
 
 import javax.persistence.*;
 import java.util.UUID;

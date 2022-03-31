@@ -1,8 +1,9 @@
-package uz.kholmakhmatov.warehouseapp.entity;
+package uz.kholmakhmatov.warehouseapp.entity.attachment;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.kholmakhmatov.warehouseapp.entity.attachment.Attachment;
 
 import javax.persistence.*;
 

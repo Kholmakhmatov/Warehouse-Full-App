@@ -12,7 +12,7 @@ import uz.kholmakhmatov.warehouseapp.response.ResponseData;
 import uz.kholmakhmatov.warehouseapp.service.CurrencyService;
 
 @RestController
-@RequestMapping("/currency")
+@RequestMapping("api/currency")
 public class CurrencyController {
 
     @Autowired
@@ -23,14 +23,19 @@ public class CurrencyController {
         return currencyService.getAll(pageable);
     }
 
+    @GetMapping("/{id}")
+    public ResponseData findOne(@PathVariable Long id) {
+        return currencyService.findOne(id);
+    }
+
     @PostMapping
     public ResponseData add(@RequestBody Currency currency) {
         return currencyService.save(currency);
     }
 
-    @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id) {
-        return currencyService.findOne(id);
+    @PutMapping("/{id}")
+    public ResponseData edit(@PathVariable Long id, @RequestBody Currency currency) {
+        return currencyService.edit(id, currency);
     }
 
     @DeleteMapping("/{id}")
@@ -38,8 +43,4 @@ public class CurrencyController {
         return currencyService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody Currency currency) {
-        return currencyService.edit(id, currency);
-    }
 }

@@ -13,34 +13,34 @@ import uz.kholmakhmatov.warehouseapp.service.InputService;
 
 
 @RestController
-@RequestMapping("/input")
+@RequestMapping("api/input")
 public class InputController {
     @Autowired
     InputService inputService;
 
-    @PostMapping
-    public ResponseData post(@RequestBody InputDto inputDto){
-        return inputService.post(inputDto);
-    }
-
     @GetMapping
-    public Page<Input> getAll(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+    public Page<Input> getAll(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return inputService.getAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id){
+    public ResponseData findOne(@PathVariable Long id) {
         return inputService.findOne(id);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseData delete(@PathVariable Long id){
-        return inputService.delete(id);
+    @PostMapping
+    public ResponseData save(@RequestBody InputDto inputDto) {
+        return inputService.save(inputDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody InputDto inputDto){
+    public ResponseData edit(@PathVariable Long id, @RequestBody InputDto inputDto) {
         return inputService.edit(id, inputDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseData delete(@PathVariable Long id) {
+        return inputService.delete(id);
     }
 
 

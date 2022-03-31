@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import uz.kholmakhmatov.warehouseapp.entity.Attachment;
-import uz.kholmakhmatov.warehouseapp.entity.AttachmentContent;
+import uz.kholmakhmatov.warehouseapp.entity.attachment.Attachment;
+import uz.kholmakhmatov.warehouseapp.entity.attachment.AttachmentContent;
 import uz.kholmakhmatov.warehouseapp.repository.AttachmentContentRepository;
 import uz.kholmakhmatov.warehouseapp.repository.AttachmentRepository;
 import uz.kholmakhmatov.warehouseapp.response.ResponseData;
@@ -30,6 +30,27 @@ public class AttachmentService {
 
     public Page<Attachment> getAllImagesInfo(Pageable pageable) {
         return attachmentRepository.findAll(pageable);
+    }
+
+    @SneakyThrows
+    public ResponseData findOne(Long id, HttpServletResponse response) {
+        Optional<Attachment> attachmentOptional = attachmentRepository.findById(id);
+
+        if (attachmentOptional.isPresent()) {
+            Attachment attachment = attachmentOptional.get();
+
+            Optional<AttachmentContent> contentOptional = attachmentContentRepository.findAttachmentContentByAttachmentId(id);
+
+            if (contentOptional.isPresent()) {
+
+                response.setContentType(attachment.getContentType());
+                response.setHeader("Content-Disposition", "attachment; filename = \"" + attachment.getName() + "\"");
+
+                FileCopyUtils.copy(contentOptional.get().getBytes(), response.getOutputStream());
+                return new ResponseData("SuccessDownloaded", true, attachment.getName());
+            }
+        }
+        return new ResponseData("Photo not found", false);
     }
 
     public ResponseData save(MultipartHttpServletRequest multipartHttpServletRequest) throws IOException {
@@ -56,40 +77,6 @@ public class AttachmentService {
             }
         }
         return new ResponseData("Successfully saved", true);
-    }
-
-    @SneakyThrows
-    public ResponseData findOne(Long id, HttpServletResponse response) {
-        Optional<Attachment> attachmentOptional = attachmentRepository.findById(id);
-
-        if (attachmentOptional.isPresent()) {
-            Attachment attachment = attachmentOptional.get();
-
-            Optional<AttachmentContent> contentOptional = attachmentContentRepository.findAttachmentContentByAttachmentId(id);
-
-            if (contentOptional.isPresent()) {
-
-                response.setContentType(attachment.getContentType());
-                response.setHeader("Content-Disposition", "attachment; filename = \"" + attachment.getName() + "\"");
-
-                FileCopyUtils.copy(contentOptional.get().getBytes(), response.getOutputStream());
-                return new ResponseData("SuccessDownloaded", true, attachment.getName());
-            }
-        }
-        return new ResponseData("Photo not found", false);
-    }
-
-    public ResponseData delete(Long id) {
-        Optional<Attachment> attachmentOptional = attachmentRepository.findById(id);
-
-        if (attachmentOptional.isEmpty())
-            return new ResponseData("Not found", false);
-
-        Optional<AttachmentContent> content = attachmentContentRepository.findAttachmentContentByAttachmentId(id);
-        content.ifPresent(attachmentContent -> attachmentContentRepository.delete(attachmentContent));
-        attachmentRepository.deleteById(id);
-
-        return new ResponseData("Successfully deleted", true);
     }
 
     @SneakyThrows
@@ -120,4 +107,18 @@ public class AttachmentService {
 
         return new ResponseData("Successfully edited", true);
     }
+
+    public ResponseData delete(Long id) {
+        Optional<Attachment> attachmentOptional = attachmentRepository.findById(id);
+
+        if (attachmentOptional.isEmpty())
+            return new ResponseData("Not found", false);
+
+        Optional<AttachmentContent> content = attachmentContentRepository.findAttachmentContentByAttachmentId(id);
+        content.ifPresent(attachmentContent -> attachmentContentRepository.delete(attachmentContent));
+        attachmentRepository.deleteById(id);
+
+        return new ResponseData("Successfully deleted", true);
+    }
+
 }

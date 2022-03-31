@@ -11,7 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Category{
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -10,7 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import uz.kholmakhmatov.warehouseapp.entity.Attachment;
+import uz.kholmakhmatov.warehouseapp.entity.attachment.Attachment;
 import uz.kholmakhmatov.warehouseapp.response.ResponseData;
 import uz.kholmakhmatov.warehouseapp.service.AttachmentService;
 
@@ -18,15 +18,20 @@ import uz.kholmakhmatov.warehouseapp.service.AttachmentService;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("/attachment")
+@RequestMapping("api/attachment")
 public class AttachmentController {
 
     @Autowired
     AttachmentService attachmentService;
 
-    @GetMapping("/info")
+    @GetMapping()
     public Page<Attachment> getAllImagesInfo(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return attachmentService.getAllImagesInfo(pageable);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseData findOne(@PathVariable Long id, HttpServletResponse response) {
+        return attachmentService.findOne(id, response);
     }
 
     @SneakyThrows
@@ -35,9 +40,9 @@ public class AttachmentController {
         return attachmentService.save(httpServletRequest);
     }
 
-    @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id, HttpServletResponse response) {
-        return attachmentService.findOne(id, response);
+    @PutMapping("/{id}")
+    public ResponseData edit(@PathVariable Long id, @RequestBody MultipartFile multipartFile) {
+        return attachmentService.edit(id, multipartFile);
     }
 
     @DeleteMapping("/{id}")
@@ -45,8 +50,4 @@ public class AttachmentController {
         return attachmentService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody MultipartFile multipartFile) {
-        return attachmentService.edit(id, multipartFile);
-    }
 }

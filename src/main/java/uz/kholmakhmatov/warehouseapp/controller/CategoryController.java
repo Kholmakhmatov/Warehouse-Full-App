@@ -13,7 +13,7 @@ import uz.kholmakhmatov.warehouseapp.service.CategoryService;
 
 
 @RestController
-@RequestMapping("/category")
+@RequestMapping("api/category")
 public class CategoryController {
 
     @Autowired
@@ -24,14 +24,19 @@ public class CategoryController {
         return categoryService.getAll(pageable);
     }
 
+    @GetMapping("/{id}")
+    public ResponseData findOne(@PathVariable Long id) {
+        return categoryService.findOne(id);
+    }
+
     @PostMapping
     public ResponseData add(@RequestBody CategoryDto categoryDto) {
         return categoryService.save(categoryDto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id) {
-        return categoryService.findOne(id);
+    @PutMapping("/{id}")
+    public ResponseData edit(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
+        return categoryService.edit(id, categoryDto);
     }
 
     @DeleteMapping("/{id}")
@@ -39,8 +44,4 @@ public class CategoryController {
         return categoryService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
-        return categoryService.edit(id, categoryDto);
-    }
 }

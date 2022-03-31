@@ -33,7 +33,16 @@ public class OutputService {
     @Autowired
     ClientRepository clientRepository;
 
-    public ResponseData post(OutputDto outputDto) {
+    public Page<Output> getAll(Pageable pageable) {
+        return outputRepository.findAll(pageable);
+    }
+
+    public ResponseData findOne(Long id) {
+        Optional<Output> optionalOutput = outputRepository.findById(id);
+        return optionalOutput.map(output -> new ResponseData("success", true, output)).orElseGet(() -> new ResponseData("not found", false));
+    }
+
+    public ResponseData save(OutputDto outputDto) {
         Optional<Client> byClientId = clientRepository.findById(outputDto.getClientId());
         if (byClientId.isEmpty())
             return new ResponseData("client not found", false);
@@ -56,24 +65,6 @@ public class OutputService {
 
         return new ResponseData("saved",true);
 
-    }
-
-    public Page<Output> getAll(Pageable pageable) {
-        return outputRepository.findAll(pageable);
-    }
-
-    public ResponseData findOne(Long id) {
-        Optional<Output> optionalOutput = outputRepository.findById(id);
-        return optionalOutput.map(output -> new ResponseData("success", true, output)).orElseGet(() -> new ResponseData("not found", false));
-    }
-
-    public ResponseData delete(Long id) {
-        Optional<Output> optionalOutput = outputRepository.findById(id);
-        if (optionalOutput.isPresent()){
-            outputRepository.deleteById(id);
-            return new ResponseData("successfully deleted", true);
-        }
-        return new ResponseData("not found", false);
     }
 
     public ResponseData edit(Long id, OutputDto outputDto) {
@@ -104,5 +95,14 @@ public class OutputService {
         outputRepository.save(output);
 
         return new ResponseData("saved",true);
+    }
+
+    public ResponseData delete(Long id) {
+        Optional<Output> optionalOutput = outputRepository.findById(id);
+        if (optionalOutput.isPresent()){
+            outputRepository.deleteById(id);
+            return new ResponseData("successfully deleted", true);
+        }
+        return new ResponseData("not found", false);
     }
 }

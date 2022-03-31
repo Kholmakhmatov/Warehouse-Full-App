@@ -21,6 +21,12 @@ public class SupplierService {
         return supplierRepository.findAllByActiveTrue(pageable);
     }
 
+    public ResponseData findOne(Long id) {
+        Optional<Supplier> optionalSupplier = supplierRepository.findByIdAndActiveTrue(id);
+        return optionalSupplier.map(supplier -> new ResponseData("Success", true, supplier))
+                .orElseGet(() -> new ResponseData("Supplier does not exist", false));
+    }
+
     public ResponseData save(Supplier supplier) {
         Optional<Supplier> supplierOptional = supplierRepository.findByPhone(supplier.getPhone());
 
@@ -37,10 +43,18 @@ public class SupplierService {
         return new ResponseData("Successfully saved", true, supplier);
     }
 
-    public ResponseData findOne(Long id) {
-        Optional<Supplier> optionalSupplier = supplierRepository.findByIdAndActiveTrue(id);
-        return optionalSupplier.map(supplier -> new ResponseData("Success", true, supplier))
-                .orElseGet(() -> new ResponseData("Supplier does not exist", false));
+    public ResponseData edit(Long id, Supplier supplier) {
+        Optional<Supplier> supplierOptional = supplierRepository.findByIdAndActiveTrue(id);
+        if (supplierOptional.isEmpty()) {
+            return new ResponseData("Supplier does not exist", false);
+        }
+        Optional<Supplier> byPhoneNumber = supplierRepository.findByPhoneAndActiveFalse(supplier.getPhone());
+        byPhoneNumber.ifPresent(value -> supplierRepository.delete(value));
+
+        supplier.setId(id);
+        supplierRepository.save(supplier);
+
+        return new ResponseData("Successfully saved", true, supplier);
     }
 
     public ResponseData delete(Long id) {
@@ -54,19 +68,5 @@ public class SupplierService {
         supplierRepository.save(supplier);
 
         return new ResponseData("Successfully deleted", true);
-    }
-
-    public ResponseData edit(Long id, Supplier supplier) {
-        Optional<Supplier> supplierOptional = supplierRepository.findByIdAndActiveTrue(id);
-        if (supplierOptional.isEmpty()) {
-            return new ResponseData("Supplier does not exist", false);
-        }
-        Optional<Supplier> byPhoneNumber = supplierRepository.findByPhoneAndActiveFalse(supplier.getPhone());
-        byPhoneNumber.ifPresent(value -> supplierRepository.delete(value));
-
-        supplier.setId(id);
-        supplierRepository.save(supplier);
-
-        return new ResponseData("Successfully saved", true, supplier);
     }
 }

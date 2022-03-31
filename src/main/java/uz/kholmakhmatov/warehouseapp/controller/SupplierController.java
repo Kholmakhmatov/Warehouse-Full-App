@@ -11,7 +11,7 @@ import uz.kholmakhmatov.warehouseapp.response.ResponseData;
 import uz.kholmakhmatov.warehouseapp.service.SupplierService;
 
 @RestController
-@RequestMapping("/supplier")
+@RequestMapping("api/supplier")
 public class SupplierController {
 
     @Autowired
@@ -22,14 +22,19 @@ public class SupplierController {
         return supplierService.getAll(pageable);
     }
 
+    @GetMapping("/{id}")
+    public ResponseData findOne(@PathVariable Long id) {
+        return supplierService.findOne(id);
+    }
+
     @PostMapping
     public ResponseData add(@RequestBody Supplier supplier) {
         return supplierService.save(supplier);
     }
 
-    @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id) {
-        return supplierService.findOne(id);
+    @PutMapping("/{id}")
+    public ResponseData edit(@PathVariable Long id, @RequestBody Supplier supplier) {
+        return supplierService.edit(id, supplier);
     }
 
     @DeleteMapping("/{id}")
@@ -37,8 +42,4 @@ public class SupplierController {
         return supplierService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody Supplier supplier) {
-        return supplierService.edit(id, supplier);
-    }
 }

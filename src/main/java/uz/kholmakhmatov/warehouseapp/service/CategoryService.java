@@ -25,6 +25,13 @@ public class CategoryService {
         return categoryRepository.findAllByActiveTrue(pageable);
     }
 
+    public ResponseData findOne(Long id) {
+        Optional<Category> optionalCategory = categoryRepository.findByIdAndActiveTrue(id);
+        return optionalCategory.map(category -> new ResponseData("Success", true, optionalCategory.get()))
+                .orElseGet(() -> new ResponseData("Category does not exist", false));
+
+    }
+
     public ResponseData save(CategoryDto categoryDto) {
 
         Optional<Category> categoryOptional = categoryRepository.findByNameAndActiveTrue(categoryDto.getName());
@@ -53,28 +60,6 @@ public class CategoryService {
 
         categoryRepository.save(category);
         return new ResponseData("Successfully saved", true);
-    }
-
-    public ResponseData findOne(Long id) {
-        Optional<Category> optionalCategory = categoryRepository.findByIdAndActiveTrue(id);
-        return optionalCategory.map(category -> new ResponseData("Success", true, optionalCategory.get()))
-                .orElseGet(() -> new ResponseData("Category does not exist", false));
-
-    }
-
-    public ResponseData delete(Long id) {
-        Optional<Category> optionalCategory = categoryRepository.findByIdAndActiveTrue(id);
-
-        if (optionalCategory.isEmpty())
-            return new ResponseData("Not found", false);
-
-        productService.deleteByCategoryId(id);
-
-        Category category = optionalCategory.get();
-        category.setActive(false);
-        categoryRepository.save(category);
-
-        return new ResponseData("Successfully deleted", true);
     }
 
     public ResponseData edit(Long id, CategoryDto categoryDto) {
@@ -115,5 +100,20 @@ public class CategoryService {
 
         categoryRepository.save(category);
         return new ResponseData("Successfully saved", true);
+    }
+
+    public ResponseData delete(Long id) {
+        Optional<Category> optionalCategory = categoryRepository.findByIdAndActiveTrue(id);
+
+        if (optionalCategory.isEmpty())
+            return new ResponseData("Not found", false);
+
+        productService.deleteByCategoryId(id);
+
+        Category category = optionalCategory.get();
+        category.setActive(false);
+        categoryRepository.save(category);
+
+        return new ResponseData("Successfully deleted", true);
     }
 }

@@ -35,7 +35,16 @@ public class InputService {
     @Autowired
     CurrencyRepository currencyRepository;
 
-    public ResponseData post(InputDto inputDto) {
+    public Page<Input> getAll(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return inputRepository.findAll(pageable);
+    }
+
+    public ResponseData findOne(Long id) {
+        Optional<Input> optionalInput = inputRepository.findById(id);
+        return optionalInput.map(input -> new ResponseData("success", true, input)).orElseGet(() -> new ResponseData("not found", false));
+    }
+
+    public ResponseData save(InputDto inputDto) {
 
         Optional<Supplier> bySupplierId = supplierRepository.findById(inputDto.getSupplierId());
         if (bySupplierId.isEmpty())
@@ -58,24 +67,6 @@ public class InputService {
         inputRepository.save(input);
 
         return new ResponseData("saved", true);
-    }
-
-    public Page<Input> getAll(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return inputRepository.findAll(pageable);
-    }
-
-    public ResponseData findOne(Long id) {
-        Optional<Input> optionalInput = inputRepository.findById(id);
-        return optionalInput.map(input -> new ResponseData("success", true, input)).orElseGet(() -> new ResponseData("not found", false));
-    }
-
-    public ResponseData delete(Long id) {
-        Optional<Input> optionalInput = inputRepository.findById(id);
-        if (optionalInput.isPresent()) {
-            inputRepository.deleteById(id);
-            return new ResponseData("successfully deleted", true);
-        }
-        return new ResponseData("not found", false);
     }
 
     public ResponseData edit(Long id, InputDto inputDto) {
@@ -106,5 +97,14 @@ public class InputService {
         inputRepository.save(input);
 
         return new ResponseData("saved", true);
+    }
+
+    public ResponseData delete(Long id) {
+        Optional<Input> optionalInput = inputRepository.findById(id);
+        if (optionalInput.isPresent()) {
+            inputRepository.deleteById(id);
+            return new ResponseData("successfully deleted", true);
+        }
+        return new ResponseData("not found", false);
     }
 }

@@ -13,34 +13,35 @@ import uz.kholmakhmatov.warehouseapp.service.OutputService;
 
 
 @RestController
-@RequestMapping("/output")
+@RequestMapping("api/output")
 public class OutputController {
     @Autowired
     OutputService outputService;
 
-    @PostMapping
-    public ResponseData post(@RequestBody OutputDto outputDto){
-        return outputService.post(outputDto);
-    }
-
     @GetMapping
-    public Page<Output> getAll(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+    public Page<Output> getAll(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return outputService.getAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id){
+    public ResponseData findOne(@PathVariable Long id) {
         return outputService.findOne(id);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseData delete(@PathVariable Long id){
-        return outputService.delete(id);
+    @PostMapping
+    public ResponseData save(@RequestBody OutputDto outputDto) {
+        return outputService.save(outputDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody OutputDto outputDto){
+    public ResponseData edit(@PathVariable Long id, @RequestBody OutputDto outputDto) {
         return outputService.edit(id, outputDto);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseData delete(@PathVariable Long id) {
+        return outputService.delete(id);
+    }
+
 
 }

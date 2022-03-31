@@ -12,7 +12,7 @@ import uz.kholmakhmatov.warehouseapp.service.MeasurementService;
 
 
 @RestController
-@RequestMapping("/measurement")
+@RequestMapping("api/measurement")
 public class MeasurementController {
 
     @Autowired
@@ -23,14 +23,19 @@ public class MeasurementController {
         return measurementService.getAll(pageable);
     }
 
+    @GetMapping("/{id}")
+    public ResponseData findOne(@PathVariable Long id) {
+        return measurementService.findOne(id);
+    }
+
     @PostMapping
     public ResponseData addMeasurement(@RequestBody Measurement measurement) {
         return measurementService.save(measurement);
     }
 
-    @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id) {
-        return measurementService.findOne(id);
+    @PutMapping("/{id}")
+    public ResponseData edit(@PathVariable Long id, @RequestBody Measurement measurement) {
+        return measurementService.edit(id, measurement);
     }
 
     @DeleteMapping("/{id}")
@@ -38,8 +43,4 @@ public class MeasurementController {
         return measurementService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody Measurement measurement) {
-        return measurementService.edit(id, measurement);
-    }
 }

@@ -21,6 +21,13 @@ public class CurrencyService {
         return currencyRepository.findAllByActiveTrue(pageable);
     }
 
+    public ResponseData findOne(Long id) {
+        Optional<Currency> optionalWarehouse = currencyRepository.findByIdAndActiveTrue(id);
+        return optionalWarehouse.map(warehouse -> new ResponseData("Success", true, warehouse))
+                .orElseGet(() -> new ResponseData("Warehouse does not exist", false));
+
+    }
+
     public ResponseData save(Currency currency) {
         Optional<Currency> optionalCurrency = currencyRepository.findByName(currency.getName());
         if (optionalCurrency.isEmpty()){
@@ -37,11 +44,17 @@ public class CurrencyService {
         return new ResponseData("Successfully saved", true);
     }
 
-    public ResponseData findOne(Long id) {
-        Optional<Currency> optionalWarehouse = currencyRepository.findByIdAndActiveTrue(id);
-        return optionalWarehouse.map(warehouse -> new ResponseData("Success", true, warehouse))
-                .orElseGet(() -> new ResponseData("Warehouse does not exist", false));
+    public ResponseData edit(Long id, Currency currency) {
+        Optional<Currency> optionalCurrency = currencyRepository.findByIdAndActiveTrue(id);
+        if (optionalCurrency.isEmpty()){
+            return new ResponseData("Warehouse does not exist", false);
+        }
+        Optional<Currency> byName = currencyRepository.findByNameAndActiveFalse(currency.getName());
+        byName.ifPresent(value -> currencyRepository.delete(value));
 
+        currency.setId(id);
+        currencyRepository.save(currency);
+        return new ResponseData("Successfully saved", true);
     }
 
     public ResponseData delete(Long id) {
@@ -55,18 +68,5 @@ public class CurrencyService {
         currencyRepository.save(currency);
 
         return new ResponseData("Successfully deleted", true);
-    }
-
-    public ResponseData edit(Long id, Currency currency) {
-        Optional<Currency> optionalCurrency = currencyRepository.findByIdAndActiveTrue(id);
-        if (optionalCurrency.isEmpty()){
-            return new ResponseData("Warehouse does not exist", false);
-        }
-        Optional<Currency> byName = currencyRepository.findByNameAndActiveFalse(currency.getName());
-        byName.ifPresent(value -> currencyRepository.delete(value));
-
-        currency.setId(id);
-        currencyRepository.save(currency);
-        return new ResponseData("Successfully saved", true);
     }
 }

@@ -12,7 +12,7 @@ import uz.kholmakhmatov.warehouseapp.response.ResponseData;
 import uz.kholmakhmatov.warehouseapp.service.ProductService;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("api/product")
 public class ProductController {
 
     @Autowired
@@ -23,14 +23,19 @@ public class ProductController {
         return productService.getAll(pageable);
     }
 
+    @GetMapping("/{id}")
+    public ResponseData findOne(@PathVariable Long id) {
+        return productService.findOne(id);
+    }
+
     @PostMapping
     public ResponseData add(@RequestBody ProductDto productDto) {
         return productService.save(productDto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseData findOne(@PathVariable Long id) {
-        return productService.findOne(id);
+    @PutMapping("/{id}")
+    public ResponseData edit(@PathVariable Long id, @RequestBody ProductDto productDto) {
+        return productService.edit(id, productDto);
     }
 
     @DeleteMapping("/{id}")
@@ -38,8 +43,4 @@ public class ProductController {
         return productService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public ResponseData edit(@PathVariable Long id, @RequestBody ProductDto productDto) {
-        return productService.edit(id, productDto);
-    }
 }
